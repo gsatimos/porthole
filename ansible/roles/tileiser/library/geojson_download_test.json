@@ -1,0 +1,16 @@
+{
+  "ANSIBLE_MODULE_ARGS": {
+      "geoserver_endpoint": "http://<geoserver_host>/geoserver",
+      "geojson_dir": "/path_to/porthole/geojson",
+      "layers": [
+        {
+          "name": "imos:marvl3_atlas_tempn_map",
+          "tile_processing": {
+            "max_features": 10,
+            "date_field": "TIME_bound_min"
+          }
+        }
+      ]
+    }
+}
+

@@ -1,0 +1,49 @@
+{
+  "ANSIBLE_MODULE_ARGS": {
+      "geojson_dir": "/path_to/porthole/geojson",
+      "geoserver_endpoint": "http://<geoserver_host>/geoserver",
+      "imos_tiles": ["imos-argo_profile_map"],
+      "base_tiles": {
+            "raster": [
+                "bathcl500md_coloured",
+                "worldmap_large_default"
+            ],
+            "vector": [
+                "cstauscd_r",
+                "continent"
+            ]
+        },
+      "layers": [
+        {
+          "name": "imos:argo_profile_map",
+          "max_features": 10,
+          "ui": {
+              "filter_options": [
+                {
+                  "name": "data_centre_name",
+                  "type": "select",
+                  "display": "Data centre name",
+                  "default": "all"
+                },
+                {
+                  "name": "platform_number",
+                  "type": "select",
+                  "display": "Platform Number",
+                  "default": "all"
+                }
+              ]
+            }
+        }
+      ],
+      "collections": [
+        {
+          "title": "IMOS - Argo Profiles",
+          "image": "imos_logo.gif",
+          "organisation": "Integrated Marine Observing System (IMOS)",
+          "platform": "float",
+          "layer": "imos:argo_profile_map"
+        }
+      ]
+    }
+}
+

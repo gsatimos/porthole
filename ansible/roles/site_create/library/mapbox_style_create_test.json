@@ -1,0 +1,108 @@
+{
+    "ANSIBLE_MODULE_ARGS": {
+        "imos_tiles": ["imos-argo_profile_map", "imos-marvl3_atlas_tempn_map"],
+        "base_tiles": {
+            "raster": [
+                "bathcl500md_coloured",
+                "worldmap_large_default"
+            ],
+            "vector": [
+                "cstauscd_r",
+                "continent"
+            ]
+        },
+        "www_base_tiles_dir": "../www/tiles/base",
+        "www_imos_tiles_dir": "../www/tiles/imos",
+        "site": {
+            "host": {
+                "dev": "http://localhost:8000",
+                "prod": "not implemented"
+            },
+            "dev_mode": true
+        },
+        "mapbox": {
+            "style": {
+                "version": 8,
+                "name": "default",
+                "center": {
+                    "lon": 135,
+                    "lat": -23
+                },
+                "zoom": 3,
+                "sources": {
+                    "raster": {
+                        "tilesize": 256
+                    }
+                },
+                "layers": [
+                    {
+                        "id": "worldmap_large_default",
+                        "type": "raster",
+                        "source": "worldmap_large_default",
+                        "layout": {
+                            "visibility": "visible"
+                        }
+                    },
+                    {
+                        "id": "bathcl500md_coloured",
+                        "type": "raster",
+                        "source": "bathcl500md_coloured",
+                        "layout": {
+                            "visibility": "visible"
+                        }
+                    },
+                    {
+                        "id": "cstauscd-r",
+                        "type": "fill",
+                        "source": "cstauscd_r",
+                        "source-layer": "cstauscd_r",
+                        "layout": {
+                            "visibility": "visible"
+                        }
+                    },
+                    {
+                        "id": "continent",
+                        "type": "fill",
+                        "source": "continent",
+                        "source-layer": "continent",
+                        "layout": {
+                            "visibility": "visible"
+                        }
+                    }
+                ]
+            }
+        },
+        "layers": [
+            {
+            "name": "imos:marvl3_atlas_tempn_map",
+            "mapbox": {
+                "source": {
+                    "clustering": {
+                        "cluster_radius": 50
+                    }
+                },
+                "layer": {
+                    "paint": {
+                      "circle-color": {
+                        "property": "TEMP_mean",
+                        "stops": [[-5, "#f1f075"], [0, "#e55e5e"], [5, "red"], [10, "blue"], [20, "green"]],
+                        "default": "blue"},
+                      "circle-radius": 1.5
+                    }
+                }
+            }
+        },
+            {
+            "name": "imos:argo_profile_map",
+            "mapbox": {
+                "layer": {
+                  "paint": {
+                    "circle-color": "hsl(49, 96%, 53%)",
+                    "circle-radius": 1
+                  }
+                }
+            }
+        }
+        ]
+    }
+}

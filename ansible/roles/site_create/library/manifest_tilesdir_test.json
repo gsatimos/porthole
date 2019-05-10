@@ -1,0 +1,6 @@
+{
+  "ANSIBLE_MODULE_ARGS": {
+      "www_imos_tiles_dir": "/path_to/porthole/www/tiles/imos",
+      "www_base_tiles_dir": "/path_to/porthole/www/tiles/base"
+    }
+}

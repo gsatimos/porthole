@@ -1,0 +1,59 @@
+
+- name: porthole tileiser
+  hosts: localhost
+  connection: local
+  gather_facts: no
+
+  roles:
+    - tileiser
+
+  tasks:
+
+    - name: remove porthole dir
+      file: path={{ porthole_dir }} state=absent
+
+    - name: create porthole dir
+      file: path={{ porthole_dir }} state=directory
+
+    - name: delete geojson dir
+      file: path={{ geojson_dir }} state=absent
+      tags:
+        - download-geojson
+
+    - name: create geojson dir
+      file: path={{ geojson_dir }} state=directory
+      tags:
+        - download-geojson
+
+    - name: create mbtiles dir
+      file: path={{ mbtiles_dir }} state=directory
+
+    - name: create disktiles dir
+      file: path={{ disktiles_dir }} state=directory
+
+    - name: create imos disktiles dir
+      file: path={{ imos_disktiles_dir }} state=directory
+
+    - name: download geojson
+      geojson_download:
+        geoserver_endpoint: "{{ geoserver_endpoint}}"
+        geojson_dir: "{{ geojson_dir }}"
+        layers: "{{ layers }}"
+      tags:
+        - download-geojson
+
+    - name: create mbtiles
+      mbtiles_create:
+        mbtiles_dir: "{{ mbtiles_dir }}"
+        geojson_dir: "{{ geojson_dir }}"
+      register: mbtiles_create
+
+    - name: export mbtiles to disk
+      diskify_tiles:
+        mbtiles_dir: "{{ mbtiles_dir }}"
+        disktiles_dir: "{{ imos_disktiles_dir}}"
+
+    - name: create base tiles
+      shell: ../bin/base_tile_processing.sh ../resources "{{ base_disktiles_dir }}"
+      tags:
+        - basetiles

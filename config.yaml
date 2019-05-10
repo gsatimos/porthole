@@ -1,0 +1,151 @@
+
+site:
+  dev_mode: true
+  host:
+    dev: http://localhost:8000
+    prod: "not implemented"
+
+geoserver_endpoint: http://<geoserver_host>/geoserver
+
+porthole_dir: /tmp/porthole
+geojson_dir: ../geojson
+mbtiles_dir: /tmp/porthole/mbtiles
+disktiles_dir: /tmp/porthole/disktiles
+imos_disktiles_dir: /tmp/porthole/disktiles/imos
+base_disktiles_dir: /tmp/porthole_basetiles/disktiles
+
+www_dir: ../www
+www_tiles_dir: ../www/tiles
+www_imos_tiles_dir: ../www/tiles/imos
+www_base_tiles_dir: ../www/tiles/base
+
+www_config_file: ../www/config.json
+www_mapbox_style_file: ../www/style.json
+
+
+layers:
+  -
+    name: imos:argo_profile_map
+    tile_processing:
+      date_field: juld
+      max_features: all
+    mapbox:
+      source: none
+      layer:
+        paint:
+          circle-color: hsl(49, 96%, 53%)
+          circle-radius: 1.5
+    ui:
+      filter_options:
+        -
+          name: data_centre_name
+          type: select
+          display: Data centre name
+          default: all
+        - name: platform_number
+          type: select
+          display: Platform Number
+          default: all
+        - name: profile_processing_type
+          type: select
+          display: Realtime/Delayed
+          default: all
+        - name: juld
+          type: date_range
+          display: Date Range
+          default: all
+
+  -
+    name: imos:marvl3_atlas_tempn_map
+    tile_processing:
+      date_field: TIME_bound_min
+      max_features: all
+    mapbox:
+      source:
+        clustering:
+          cluster_radius: 50
+      layer:
+        filter:
+          - "has"
+          - "point_count"
+        paint:
+          {
+            "circle-color": {
+              "property": "TEMP_mean",
+              "stops": [[-2.5, '#2b00a7'], [0, '#4300ff'], [5, '#0098e1'], [10, '#9de4ff'], [15, '#f5ff00'], [20, '#f3a600'], [25, '#f96300'], [30, '#fc0000'], [35, '#fd0000']],
+              "default": "blue"
+            },
+            "circle-radius": ["step", ["get", "point_count"], 0, 1, 10, 100, 1000]
+          }
+    ui:
+      filter_options:
+        -
+          name: depth
+          type: comparison_input
+          display: Depth
+          default: all
+          values:
+            - none
+            - greater than
+            - greater than or equal to
+            - equal to
+            - not equal to
+            - less than
+            - less than or equal to
+        - name: juld
+          type: date_range
+          display: Date Range
+          default: none
+
+mapbox:
+  style:
+    version: 8
+    name: default
+    center:
+      lon: 135.00
+      lat: -23.00
+    zoom: 3
+    sources:
+      raster:
+        tilesize: 256
+    layers:
+      - id: worldmap_large_default
+        type: raster
+        source: worldmap_large_default
+        layout:
+          visibility: visible
+      - id: bathcl500md_coloured
+        type: raster
+        source: bathcl500md_coloured
+        layout:
+          visibility: visible
+      - id: cstauscd-r
+        type: fill
+        source: cstauscd_r
+        source-layer: cstauscd_r
+        layout:
+          visibility: visible
+        paint:
+          fill-color: hsl(0, 0%, 100%)
+      - id: continent
+        type: fill
+        source: continent
+        source-layer: continent
+        layout:
+          visibility: visible
+        paint:
+          fill-color: hsl(0, 0%, 100%)
+
+collections:
+  -
+    title: IMOS - Argo Profiles
+    image: imos_logo.gif
+    organisation: Integrated Marine Observing System (IMOS)
+    platform: float
+    layer: imos:argo_profile_map
+  -
+    title: MARVL3 - Australian shelf temperature data atlas
+    image: imos_logo.gif
+    organisation: Integrated Marine Observing System (IMOS)
+    platform: combined
+    layer: imos:marvl3_atlas_tempn_map

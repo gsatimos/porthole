@@ -1,0 +1,80 @@
+
+- name: porthole tileiser
+  hosts: localhost
+  connection: local
+  gather_facts: no
+
+  roles:
+    - site_create
+
+  tasks:
+    - name: remove porthole www dir
+      file: path={{ www_dir }} state=absent
+
+    - name: create porthole www dir
+      file: path={{ www_dir }} state=directory
+
+    - name: create porthole imos tiles dir
+      file: path={{ www_imos_tiles_dir }} state=directory
+
+    - name: create porthole base tiles dir
+      file: path={{ www_base_tiles_dir }} state=directory
+
+    - name: copy imos layer tiles
+      command: cp -R "{{ imos_disktiles_dir }}"/. "{{ www_imos_tiles_dir }}"/
+
+    - name: copy base layer tiles
+      command: cp -R "{{ base_disktiles_dir }}"/. "{{ www_base_tiles_dir }}"/
+
+    - name: create manifest of tiles directory
+      manifest_tilesdir:
+        www_imos_tiles_dir: "{{ www_imos_tiles_dir }}"
+        www_base_tiles_dir: "{{ www_base_tiles_dir }}"
+      register: manifest_tilesdir
+
+    - name: debug tiles manifest
+      debug:
+        msg: "{{ manifest_tilesdir }}"
+
+    - name: create config for web
+      web_config_create:
+        geojson_dir: "{{ geojson_dir }}"
+        geoserver_endpoint: "{{ geoserver_endpoint}}"
+        imos_tiles: "{{ manifest_tilesdir.imos_tiles }}"
+        base_tiles: "{{ manifest_tilesdir.base_tiles }}"
+        layers: "{{ layers }}"
+        collections: "{{ collections }}"
+      register: web_config_create
+
+    - name: debug create config for web
+      debug:
+        msg: "{{ web_config_create.web_config }}"
+
+    - name: write web config to file
+      pprint_content_to_file:
+        content: "{{ web_config_create.web_config }}"
+        file: "{{ www_config_file }}"
+
+    - name: create mapbox style
+      mapbox_style_create:
+        imos_tiles: "{{ manifest_tilesdir.imos_tiles }}"
+        base_tiles: "{{ manifest_tilesdir.base_tiles }}"
+        site: "{{ site }}"
+        mapbox: "{{ mapbox }}"
+        www_base_tiles_dir: "{{ www_base_tiles_dir }}"
+        www_imos_tiles_dir: "{{ www_imos_tiles_dir }}"
+        layers: "{{ layers }}"
+      register: mapbox_style_create
+
+    - name: write mapbox style to file
+      pprint_content_to_file:
+        content: "{{ mapbox_style_create.mapbox_style }}"
+        file: "{{ www_mapbox_style_file }}"
+
+    - name: unzip .pbf vector tiles (dev mode)
+      command: find "{{ www_tiles_dir }}" -name "*.pbf" -exec gunzip -S ".pbf" {} \;
+      when: site.dev_mode
+
+
+
+
